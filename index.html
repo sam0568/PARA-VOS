@@ -1,0 +1,1523 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Un pequeño regalo 🌼</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #070a16;
+}
+
+body {
+    font-family: 'Press Start 2P', monospace;
+    color: white;
+    image-rendering: pixelated;
+}
+
+/* =========================================
+   GAME
+========================================= */
+
+#game {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #172653 0%,
+            #0b1024 48%,
+            #050711 100%
+        );
+}
+
+/* Scanlines */
+
+#game::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 100;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.025) 0px,
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    mix-blend-mode: overlay;
+}
+
+/* =========================================
+   STARS
+========================================= */
+
+.stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+
+    width: 3px;
+    height: 3px;
+
+    background: white;
+
+    opacity: .7;
+
+    animation:
+        twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+
+    from {
+        opacity: .2;
+    }
+
+    to {
+        opacity: .9;
+    }
+}
+
+/* =========================================
+   SCREENS
+========================================= */
+
+.screen {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity .7s ease;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* =========================================
+   START
+========================================= */
+
+.logo {
+
+    font-size:
+        clamp(18px, 4vw, 32px);
+
+    letter-spacing: 2px;
+
+    text-align: center;
+
+    margin-bottom: 18px;
+
+    text-shadow:
+        3px 3px 0 #000,
+        0 0 20px rgba(255,255,255,.15);
+}
+
+.subtitle {
+
+    font-size: 9px;
+
+    line-height: 2;
+
+    text-align: center;
+
+    opacity: .65;
+
+    margin-bottom: 50px;
+}
+
+/* =========================================
+   PIXEL BOX
+========================================= */
+
+.pixel-box {
+
+    border: 4px solid white;
+
+    box-shadow:
+        0 0 0 4px #101426,
+        0 0 0 7px rgba(255,255,255,.3),
+        0 15px 50px rgba(0,0,0,.5);
+
+    background:
+        rgba(10,15,35,.88);
+}
+
+/* =========================================
+   START BUTTON
+========================================= */
+
+button {
+
+    font-family: inherit;
+
+    cursor: pointer;
+}
+
+.start-button {
+
+    border: 0;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 12px;
+
+    padding:
+        18px 30px;
+
+    text-shadow:
+        2px 2px #000;
+
+    animation:
+        blink 1s infinite alternate;
+}
+
+.start-button::before {
+    content: "▶ ";
+}
+
+.start-button:hover {
+    color: #ffe600;
+}
+
+@keyframes blink {
+
+    from {
+        opacity: .55;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================
+   FLOWER SCREEN
+========================================= */
+
+#flowerScreen {
+    justify-content: center;
+}
+
+#threeContainer {
+
+    position: absolute;
+
+    inset: 0;
+}
+
+.flower-title {
+
+    position: absolute;
+
+    top: 7%;
+
+    z-index: 10;
+
+    text-align: center;
+
+    font-size: 10px;
+
+    line-height: 2;
+
+    text-shadow:
+        2px 2px #000;
+
+    pointer-events: none;
+}
+
+.flower-hint {
+
+    position: absolute;
+
+    bottom: 8%;
+
+    z-index: 10;
+
+    font-size: 8px;
+
+    opacity: .6;
+
+    text-align: center;
+
+    pointer-events: none;
+}
+
+/* =========================================
+   DIALOGUE
+========================================= */
+
+.dialogue {
+
+    width:
+        min(88%, 700px);
+
+    padding: 28px;
+
+    position: absolute;
+
+    bottom: 7%;
+
+    z-index: 20;
+
+    line-height: 2;
+
+    font-size:
+        clamp(9px, 1.5vw, 13px);
+
+    min-height: 145px;
+
+    cursor: pointer;
+}
+
+.dialogue-text {
+
+    min-height: 75px;
+}
+
+.next {
+
+    position: absolute;
+
+    right: 22px;
+
+    bottom: 15px;
+
+    color: #ffe600;
+
+    animation:
+        arrow 1s infinite alternate;
+}
+
+@keyframes arrow {
+
+    from {
+        opacity: .3;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================
+   FINAL
+========================================= */
+
+#finalScreen {
+
+    text-align: center;
+
+    padding: 30px;
+}
+
+.final-flower {
+
+    font-size: 70px;
+
+    filter:
+        drop-shadow(
+            0 0 25px
+            rgba(255,220,30,.6)
+        );
+
+    animation:
+        float 3s ease-in-out infinite,
+        glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+
+    0%, 100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-12px);
+    }
+}
+
+@keyframes glow {
+
+    from {
+        filter:
+            drop-shadow(
+                0 0 10px
+                rgba(255,220,30,.3)
+            );
+    }
+
+    to {
+        filter:
+            drop-shadow(
+                0 0 35px
+                rgba(255,220,30,.9)
+            );
+    }
+}
+
+.final-title {
+
+    margin-top: 25px;
+
+    font-size:
+        clamp(15px, 4vw, 25px);
+
+    line-height: 1.7;
+
+    text-shadow:
+        3px 3px #000;
+}
+
+.final-message {
+
+    margin-top: 25px;
+
+    max-width: 650px;
+
+    font-size: 9px;
+
+    line-height: 2.2;
+
+    opacity: .8;
+}
+
+.signature {
+
+    margin-top: 35px;
+
+    color: #ffe600;
+
+    font-size: 10px;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .subtitle {
+        font-size: 7px;
+        padding: 0 30px;
+    }
+
+    .dialogue {
+
+        bottom: 5%;
+
+        padding: 22px;
+
+        min-height: 155px;
+    }
+
+    .flower-title {
+
+        top: 5%;
+
+        padding:
+            0 25px;
+    }
+
+    .flower-hint {
+
+        bottom: 2%;
+
+        font-size: 7px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- =====================================
+         MÚSICA
+    ====================================== -->
+
+    <audio
+        id="bgMusic"
+        src="sound.mp3"
+        loop
+        preload="auto">
+    </audio>
+
+
+    <!-- =====================================
+         ESTRELLAS
+    ====================================== -->
+
+    <div
+        class="stars"
+        id="stars">
+    </div>
+
+
+    <!-- =====================================
+         PANTALLA INICIAL
+    ====================================== -->
+
+    <section
+        id="startScreen"
+        class="screen active">
+
+        <div class="logo">
+            UN PEQUEÑO REGALO
+        </div>
+
+        <div class="subtitle">
+
+            Una pequeña aventura<br>
+
+            preparada especialmente
+            para vos.
+
+        </div>
+
+        <div class="pixel-box">
+
+            <button
+                class="start-button"
+                id="startButton">
+
+                ABRIR
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         FLOR
+    ====================================== -->
+
+    <section
+        id="flowerScreen"
+        class="screen">
+
+        <div
+            id="threeContainer">
+        </div>
+
+
+        <div class="flower-title">
+
+            ✦ ENCONTRASTE ALGO ESPECIAL ✦
+
+        </div>
+
+
+        <div class="flower-hint">
+
+            mové el mouse / tocá la pantalla
+
+        </div>
+
+
+        <div
+            class="dialogue pixel-box"
+            id="dialogueBox">
+
+            <div
+                class="dialogue-text"
+                id="dialogueText">
+            </div>
+
+            <div
+                class="next"
+                id="nextArrow">
+
+                ▼
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         FINAL
+    ====================================== -->
+
+    <section
+        id="finalScreen"
+        class="screen">
+
+        <div class="final-flower">
+
+            🌼
+
+        </div>
+
+
+        <div class="final-title">
+
+            PARA VOS
+
+        </div>
+
+
+        <div class="final-message">
+
+            A veces no hace falta
+            una gran razón para
+            regalarle algo lindo
+            a alguien.
+
+            <br><br>
+
+            Simplemente pensé en vos,
+            y quise dejarte una
+            pequeña flor en medio
+            de tu día.
+
+        </div>
+
+
+        <div class="signature">
+
+            — Samuel
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   ESTRELLAS
+========================================= */
+
+const starsContainer =
+    document.getElementById("stars");
+
+for (let i = 0; i < 70; i++) {
+
+    const star =
+        document.createElement("div");
+
+    star.className = "star";
+
+    star.style.left =
+        Math.random() * 100 + "%";
+
+    star.style.top =
+        Math.random() * 100 + "%";
+
+    star.style.animationDelay =
+        Math.random() * 2 + "s";
+
+    starsContainer.appendChild(star);
+}
+
+
+/* =========================================
+   ELEMENTOS
+========================================= */
+
+const startScreen =
+    document.getElementById(
+        "startScreen"
+    );
+
+const flowerScreen =
+    document.getElementById(
+        "flowerScreen"
+    );
+
+const finalScreen =
+    document.getElementById(
+        "finalScreen"
+    );
+
+const startButton =
+    document.getElementById(
+        "startButton"
+    );
+
+const music =
+    document.getElementById(
+        "bgMusic"
+    );
+
+
+/* =========================================
+   CAMBIO DE PANTALLA
+========================================= */
+
+function changeScreen(from, to) {
+
+    from.classList.remove("active");
+
+    setTimeout(() => {
+
+        to.classList.add("active");
+
+    }, 500);
+}
+
+
+/* =========================================
+   THREE.JS
+========================================= */
+
+let scene;
+
+let camera;
+
+let renderer;
+
+let flowerGroup;
+
+let mouseX = 0;
+
+let mouseY = 0;
+
+
+/* =========================================
+   INICIAR THREE
+========================================= */
+
+function initThree() {
+
+    scene =
+        new THREE.Scene();
+
+
+    scene.fog =
+        new THREE.FogExp2(
+            0x070a16,
+            0.035
+        );
+
+
+    /* CAMERA */
+
+    camera =
+        new THREE.PerspectiveCamera(
+            45,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            100
+        );
+
+    camera.position.z = 7;
+
+
+    /* RENDERER */
+
+    renderer =
+        new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true
+        });
+
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    renderer.outputEncoding =
+        THREE.sRGBEncoding;
+
+
+    document
+        .getElementById(
+            "threeContainer"
+        )
+        .appendChild(
+            renderer.domElement
+        );
+
+
+    /* =====================================
+       LUCES
+    ====================================== */
+
+    const ambient =
+        new THREE.AmbientLight(
+            0xffffff,
+            1.2
+        );
+
+    scene.add(ambient);
+
+
+    const light =
+        new THREE.PointLight(
+            0xffe33b,
+            3,
+            15
+        );
+
+    light.position.set(
+        0,
+        2,
+        4
+    );
+
+    scene.add(light);
+
+
+    const blueLight =
+        new THREE.PointLight(
+            0x477cff,
+            2,
+            12
+        );
+
+    blueLight.position.set(
+        -4,
+        -2,
+        2
+    );
+
+    scene.add(blueLight);
+
+
+    /* =====================================
+       FLOR
+    ====================================== */
+
+    flowerGroup =
+        new THREE.Group();
+
+    scene.add(
+        flowerGroup
+    );
+
+
+    createFlower();
+
+
+    animate();
+}
+
+
+/* =========================================
+   CREAR FLOR
+========================================= */
+
+function createFlower() {
+
+    /* CENTRO */
+
+    const centerGeometry =
+        new THREE.SphereGeometry(
+            .48,
+            24,
+            24
+        );
+
+
+    const centerMaterial =
+        new THREE.MeshStandardMaterial({
+
+            color: 0xffc928,
+
+            roughness: .45,
+
+            metalness: .15,
+
+            emissive: 0x4a3200,
+
+            emissiveIntensity: .35
+
+        });
+
+
+    const center =
+        new THREE.Mesh(
+            centerGeometry,
+            centerMaterial
+        );
+
+
+    flowerGroup.add(center);
+
+
+    /* PÉTALOS */
+
+    const petalMaterial =
+        new THREE.MeshStandardMaterial({
+
+            color: 0xffdf21,
+
+            roughness: .55,
+
+            metalness: .05,
+
+            emissive: 0x5a4300,
+
+            emissiveIntensity: .22
+
+        });
+
+
+    const petalGeometry =
+        new THREE.SphereGeometry(
+            1,
+            24,
+            16
+        );
+
+
+    for (
+        let i = 0;
+        i < 8;
+        i++
+    ) {
+
+        const angle =
+            (Math.PI * 2 / 8) * i;
+
+
+        const petal =
+            new THREE.Mesh(
+                petalGeometry,
+                petalMaterial
+            );
+
+
+        petal.scale.set(
+            .9,
+            .38,
+            .18
+        );
+
+
+        petal.position.set(
+
+            Math.cos(angle) * .78,
+
+            Math.sin(angle) * .78,
+
+            0
+
+        );
+
+
+        petal.rotation.z =
+            angle;
+
+
+        flowerGroup.add(
+            petal
+        );
+    }
+
+
+    /* TALLO */
+
+    const stemGeometry =
+        new THREE.CylinderGeometry(
+            .07,
+            .1,
+            2.8,
+            12
+        );
+
+
+    const stemMaterial =
+        new THREE.MeshStandardMaterial({
+
+            color: 0x4c9b47,
+
+            roughness: .8
+
+        });
+
+
+    const stem =
+        new THREE.Mesh(
+            stemGeometry,
+            stemMaterial
+        );
+
+
+    stem.position.y =
+        -1.65;
+
+
+    flowerGroup.add(
+        stem
+    );
+
+
+    /* HOJAS */
+
+    const leafGeometry =
+        new THREE.SphereGeometry(
+            .65,
+            16,
+            12
+        );
+
+
+    const leafMaterial =
+        new THREE.MeshStandardMaterial({
+
+            color: 0x3e8c46,
+
+            roughness: .8
+
+        });
+
+
+    const leaf1 =
+        new THREE.Mesh(
+            leafGeometry,
+            leafMaterial
+        );
+
+
+    leaf1.scale.set(
+        1.2,
+        .35,
+        .12
+    );
+
+
+    leaf1.position.set(
+        -.38,
+        -1.6,
+        0
+    );
+
+
+    leaf1.rotation.z =
+        -.4;
+
+
+    flowerGroup.add(
+        leaf1
+    );
+
+
+    const leaf2 =
+        leaf1.clone();
+
+
+    leaf2.position.x =
+        .38;
+
+
+    leaf2.rotation.z =
+        .4;
+
+
+    flowerGroup.add(
+        leaf2
+    );
+
+
+    /* PARTÍCULAS */
+
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
+
+        const geometry =
+            new THREE.SphereGeometry(
+                .025,
+                6,
+                6
+            );
+
+
+        const material =
+            new THREE.MeshBasicMaterial({
+
+                color: 0xffe95b
+
+            });
+
+
+        const particle =
+            new THREE.Mesh(
+                geometry,
+                material
+            );
+
+
+        particle.position.set(
+
+            (Math.random() - .5) * 4,
+
+            (Math.random() - .5) * 4,
+
+            (Math.random() - .5) * 2
+
+        );
+
+
+        flowerGroup.add(
+            particle
+        );
+    }
+
+
+    flowerGroup.position.y =
+        .35;
+}
+
+
+/* =========================================
+   ANIMACIÓN
+========================================= */
+
+const clock =
+    new THREE.Clock();
+
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    const time =
+        clock.getElapsedTime();
+
+
+    if (flowerGroup) {
+
+        /* GIRO */
+
+        flowerGroup.rotation.y =
+            time * .35;
+
+
+        /* FLOTACIÓN */
+
+        flowerGroup.position.y =
+            .35 +
+            Math.sin(
+                time * 1.4
+            ) * .12;
+
+
+        /* MOUSE */
+
+        flowerGroup.rotation.x +=
+
+            (
+                mouseY * .15
+                -
+                flowerGroup.rotation.x
+            )
+            * .03;
+
+
+        flowerGroup.rotation.z +=
+
+            (
+                mouseX * .15
+                -
+                flowerGroup.rotation.z
+            )
+            * .03;
+    }
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+}
+
+
+/* =========================================
+   MOUSE
+========================================= */
+
+window.addEventListener(
+    "mousemove",
+    e => {
+
+        mouseX =
+            (
+                e.clientX /
+                window.innerWidth
+                - .5
+            ) * 2;
+
+
+        mouseY =
+            (
+                e.clientY /
+                window.innerHeight
+                - .5
+            ) * 2;
+
+    }
+);
+
+
+/* =========================================
+   TOUCH
+========================================= */
+
+window.addEventListener(
+    "touchmove",
+    e => {
+
+        const touch =
+            e.touches[0];
+
+
+        mouseX =
+            (
+                touch.clientX /
+                window.innerWidth
+                - .5
+            ) * 2;
+
+
+        mouseY =
+            (
+                touch.clientY /
+                window.innerHeight
+                - .5
+            ) * 2;
+
+    },
+    {
+        passive: true
+    }
+);
+
+
+/* =========================================
+   RESIZE
+========================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if (!camera || !renderer)
+            return;
+
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+
+/* =========================================
+   DIÁLOGOS
+========================================= */
+
+const dialogueText =
+    document.getElementById(
+        "dialogueText"
+    );
+
+
+const messages = [
+
+    "¡Encontraste algo especial!",
+
+    "Es una pequeña flor amarilla.",
+
+    "No tiene ningún poder especial.",
+
+    "No sirve para ganar una batalla.",
+
+    "Pero pensé que podía hacerte sonreír.",
+
+    "Así que decidí hacerte una."
+
+];
+
+
+let currentMessage = 0;
+
+let typing = false;
+
+let typeTimer;
+
+
+/* =========================================
+   ESCRIBIR TEXTO
+========================================= */
+
+function typeMessage(text) {
+
+    typing = true;
+
+    dialogueText.textContent = "";
+
+    let index = 0;
+
+
+    clearInterval(
+        typeTimer
+    );
+
+
+    typeTimer =
+        setInterval(() => {
+
+            dialogueText.textContent +=
+                text[index];
+
+            index++;
+
+
+            if (
+                index >=
+                text.length
+            ) {
+
+                clearInterval(
+                    typeTimer
+                );
+
+                typing = false;
+
+            }
+
+        }, 35);
+}
+
+
+/* =========================================
+   SIGUIENTE
+========================================= */
+
+function nextMessage() {
+
+    /* SI TODAVÍA ESTÁ ESCRIBIENDO */
+
+    if (typing) {
+
+        clearInterval(
+            typeTimer
+        );
+
+
+        dialogueText.textContent =
+            messages[currentMessage];
+
+
+        typing = false;
+
+        return;
+    }
+
+
+    currentMessage++;
+
+
+    /* TERMINÓ */
+
+    if (
+        currentMessage >=
+        messages.length
+    ) {
+
+        changeScreen(
+            flowerScreen,
+            finalScreen
+        );
+
+        return;
+    }
+
+
+    typeMessage(
+        messages[currentMessage]
+    );
+}
+
+
+/* =========================================
+   BOTÓN ABRIR
+========================================= */
+
+startButton.addEventListener(
+    "click",
+    () => {
+
+        /*
+            LA MÚSICA ARRANCA
+            DESPUÉS DEL CLICK.
+        */
+
+        music.volume = 0.55;
+
+        music.play().catch(
+            error => {
+
+                console.log(
+                    "No se pudo reproducir el audio:",
+                    error
+                );
+
+            }
+        );
+
+
+        /* CAMBIAR PANTALLA */
+
+        changeScreen(
+            startScreen,
+            flowerScreen
+        );
+
+
+        /* INICIAR 3D */
+
+        setTimeout(() => {
+
+            if (!scene) {
+
+                initThree();
+
+            }
+
+
+            typeMessage(
+                messages[0]
+            );
+
+        }, 800);
+
+    }
+);
+
+
+/* =========================================
+   CLICK EN DIÁLOGO
+========================================= */
+
+document
+    .getElementById(
+        "dialogueBox"
+    )
+    .addEventListener(
+        "click",
+        nextMessage
+    );
+
+
+/* =========================================
+   TECLADO
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        if (
+            e.code === "Space" ||
+            e.code === "Enter"
+        ) {
+
+            if (
+                flowerScreen
+                    .classList
+                    .contains("active")
+            ) {
+
+                nextMessage();
+
+            }
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
